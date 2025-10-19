@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Char Cleaner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        #messageForm {
+            margin-bottom: 20px;
+        }
+
+        #messageInput {
+            width: 70%;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        #chatContainer {
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .chat-message {
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            padding: 6px;
+            margin-bottom: 5px;
+        }
+
+        #response {
+            margin-top: 15px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Char Cleaner</h1>
+
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Enter your message" required>
+        <button type="submit">Send</button>
+    </form>
+
+    <div id="chatContainer"></div>
+    <div id="response"></div>
+
+    <script>
+        const form = document.getElementById('messageForm');
+        const input = document.getElementById('messageInput');
+        const chatLog = document.getElementById('chatContainer');
+        const responseDiv = document.getElementById('response');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Add message to chat container
+            const chatLine = document.createElement('div');
+            chatLine.className = 'chat-message';
+            chatLine.innerText = message;
+            chatLog.appendChild(chatLine);
+
+            // Send message to backend
+            try {
+                const res = await fetch('http://127.0.0.1:5000/message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await res.json();
+                responseDiv.innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                responseDiv.innerText = 'Error: Backend not reachable';
+            }
+
+            input.value = '';
+        });
+    </script>
+</body>
+
+</html>
